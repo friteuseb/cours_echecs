@@ -145,12 +145,20 @@ export default function PuzzleLibrary() {
             {theme || band ? ' pour ce filtre' : ' dans la bibliothèque'}
           </p>
         </div>
-        <Link
-          href="/import"
-          className="rounded-lg border border-amber-500 px-4 py-2 font-semibold text-amber-400 hover:bg-amber-500/10"
-        >
-          ＋ Importer des problèmes
-        </Link>
+        <div className="flex flex-wrap gap-3">
+          <Link
+            href="/tableau"
+            className="rounded-lg border border-zinc-700 px-4 py-2 font-semibold text-zinc-200 hover:bg-zinc-800"
+          >
+            ♟️ Échiquier libre
+          </Link>
+          <Link
+            href="/import"
+            className="rounded-lg border border-amber-500 px-4 py-2 font-semibold text-amber-400 hover:bg-amber-500/10"
+          >
+            ＋ Importer des problèmes
+          </Link>
+        </div>
       </header>
 
       <section className="flex flex-wrap items-end gap-4 rounded-xl border border-zinc-800 bg-zinc-900/50 p-4">
