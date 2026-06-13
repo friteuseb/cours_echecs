@@ -34,28 +34,30 @@ Déroulé d'une séance : `lobby` → `question` → `reveal` → … → `finis
 
 ## 🚀 Démarrage
 
-Prérequis : **Node.js 20+**.
+Prérequis : **Node.js 20+** et une base **PostgreSQL** (locale ou cloud, ex. [Neon](https://neon.tech)).
 
 ```bash
 # 1. Installer les dépendances (génère aussi le client Prisma)
 npm install
 
-# 2. Créer la base SQLite locale à partir du schéma
+# 2. Renseigner la connexion Postgres dans .env (voir ci-dessous)
+
+# 3. Créer les tables à partir du schéma
 npm run db:push
 
-# 3. (optionnel) Importer des problèmes de démonstration
+# 4. (optionnel) Importer des problèmes de démonstration
 npm run db:seed
 
-# 4. Lancer le serveur de développement
+# 5. Lancer le serveur de développement
 npm run dev
 ```
 
 Ouvrez [http://localhost:3000](http://localhost:3000).
 
-La variable d'environnement attendue (fichier `.env`) :
+La variable d'environnement attendue (fichier `.env`, ignoré par Git) :
 
 ```bash
-DATABASE_URL="file:./dev.db"
+DATABASE_URL="postgresql://user:password@host/db?sslmode=require"
 ```
 
 ---
@@ -110,11 +112,14 @@ src/
 
 ## ☁️ Déploiement
 
-En local, l'application utilise **SQLite** (`dev.db`, ignoré par Git). Pour un déploiement (Vercel), basculez vers une base **Postgres** du Marketplace Vercel :
+L'application utilise **PostgreSQL** via Prisma 7 et l'adaptateur [`@prisma/adapter-pg`](https://www.npmjs.com/package/@prisma/adapter-pg) (connexion au runtime dans `src/lib/db.ts`). Pour déployer sur **Vercel** :
 
-1. Provisionnez une base Postgres (Neon, Prisma Postgres…) via le Marketplace.
-2. Dans `prisma/schema.prisma`, passez le `provider` de la datasource à `postgresql`.
-3. Renseignez `DATABASE_URL` dans les variables d'environnement Vercel.
-4. Appliquez le schéma (`prisma db push` ou une migration) puis déployez.
+1. Provisionnez une base Postgres (Neon, Prisma Postgres…) — via le Marketplace Vercel ou directement.
+2. Dans le projet Vercel, ajoutez la variable d'environnement **`DATABASE_URL`** (la même chaîne de connexion que votre `.env`).
+3. Créez les tables : `npm run db:push` (en local, pointé sur la base de prod) ou une migration Prisma.
+4. (optionnel) Remplissez la base : `npm run db:seed`.
+5. Déployez.
 
-> Rappel : `dev.db`, `ruvector.db`, `.env*` et `.claude-flow/` sont volontairement exclus du dépôt via `.gitignore`.
+> Astuce : pour les connexions poolées (Neon `-pooler`), `sslmode=require` est attendu dans l'URL.
+
+> Rappel : `.env*`, `dev.db`, `ruvector.db` et `.claude-flow/` sont volontairement exclus du dépôt via `.gitignore`.

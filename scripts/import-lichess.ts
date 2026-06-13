@@ -14,7 +14,7 @@ import { spawn } from 'node:child_process'
 import { createInterface } from 'node:readline'
 import { Chess } from 'chess.js'
 import { PrismaClient } from '../src/generated/prisma/client'
-import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3'
+import { PrismaPg } from '@prisma/adapter-pg'
 import { FILTER_THEMES, themeLabel } from '../src/lib/themes'
 
 // Thèmes ciblés, par ordre de priorité d'affectation
@@ -43,9 +43,7 @@ function bandOf(rating: number): number {
 }
 
 async function main() {
-  const adapter = new PrismaBetterSqlite3({
-    url: process.env.DATABASE_URL ?? 'file:./dev.db',
-  })
+  const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL })
   const prisma = new PrismaClient({ adapter })
 
   // FEN déjà en base, pour ne pas importer deux fois le même puzzle

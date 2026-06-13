@@ -1,6 +1,6 @@
 import 'dotenv/config'
 import { PrismaClient } from '../src/generated/prisma/client'
-import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3'
+import { PrismaPg } from '@prisma/adapter-pg'
 
 // Quelques problèmes classiques pour démarrer (positions et solutions vérifiées)
 const puzzles = [
@@ -42,9 +42,7 @@ const puzzles = [
 ]
 
 async function main() {
-  const adapter = new PrismaBetterSqlite3({
-    url: process.env.DATABASE_URL ?? 'file:./dev.db',
-  })
+  const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL })
   const prisma = new PrismaClient({ adapter })
   for (const p of puzzles) {
     const exists = await prisma.puzzle.findFirst({ where: { fen: p.fen } })
