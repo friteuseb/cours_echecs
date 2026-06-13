@@ -1,0 +1,77 @@
+datasource db {
+  provider = "sqlite"
+}
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+model Puzzle {
+  id         String          @id @default(cuid())
+  fen        String
+  // Solution : coups UCI séparés par des espaces (ex: "h5f7" ou "d8h4 g2g3 h4g3")
+  solution   String
+  title      String?
+  themes     String?
+  difficulty Int?
+  source     String?
+  createdAt  DateTime        @default(now())
+  inSessions SessionPuzzle[]
+}
+
+model Session {
+  id          String          @id @default(cuid())
+  code        String          @unique
+  name        String?
+  // lobby | question | reveal | finished
+  status      String          @default("lobby")
+  currentIndex Int            @default(0)
+  // Limite de temps par question, en secondes
+  timeLimit   Int             @default(60)
+  questionStartedAt DateTime?
+  createdAt   DateTime        @default(now())
+  puzzles     SessionPuzzle[]
+  players     Player[]
+}
+
+model SessionPuzzle {
+  id        String   @id @default(cuid())
+  sessionId String
+  puzzleId  String
+  order     Int
+  session   Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  puzzle    Puzzle   @relation(fields: [puzzleId], references: [id], onDelete: Cascade)
+  answers   Answer[]
+
+  @@unique([sessionId, order])
+}
+
+model Player {
+  id        String   @id @default(cuid())
+  sessionId String
+  name      String
+  score     Int      @default(0)
+  createdAt DateTime @default(now())
+  session   Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  answers   Answer[]
+
+  @@unique([sessionId, name])
+}
+
+model Answer {
+  id              String        @id @default(cuid())
+  playerId        String
+  sessionPuzzleId String
+  // Coups UCI deja joues par l'eleve (et reponses auto de l'adversaire)
+  movesPlayed     String        @default("")
+  // playing | correct | wrong | timeout
+  status          String        @default("playing")
+  timeMs          Int?
+  score           Int           @default(0)
+  createdAt       DateTime      @default(now())
+  player          Player        @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  sessionPuzzle   SessionPuzzle @relation(fields: [sessionPuzzleId], references: [id], onDelete: Cascade)
+
+  @@unique([playerId, sessionPuzzleId])
+}
