@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { Chess, type Square } from 'chess.js'
-import { Chessboard } from 'react-chessboard'
+import { Chessboard, defaultPieces } from 'react-chessboard'
 
 type Color = 'white' | 'black'
 type PieceType = string // ex : "wP", "bK"
@@ -15,10 +15,6 @@ const ALL_FILES = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'] as const
 const WHITE_PALETTE: PieceType[] = ['wK', 'wQ', 'wR', 'wB', 'wN', 'wP']
 const BLACK_PALETTE: PieceType[] = ['bK', 'bQ', 'bR', 'bB', 'bN', 'bP']
 
-const PIECE_GLYPH: Record<string, string> = {
-  wK: '♔', wQ: '♕', wR: '♖', wB: '♗', wN: '♘', wP: '♙',
-  bK: '♚', bQ: '♛', bR: '♜', bB: '♝', bN: '♞', bP: '♟',
-}
 
 /** Construit une FEN à partir d'un placement libre + camp au trait. */
 function placementToFen(board: Placement, turn: 'w' | 'b'): string {
@@ -456,20 +452,23 @@ function PaletteRow({
 }) {
   return (
     <div className="flex gap-2">
-      {tools.map((t) => (
-        <button
-          key={t}
-          onClick={() => onPick(t)}
-          title={t}
-          className={`flex h-11 w-11 items-center justify-center rounded-lg border text-2xl leading-none transition ${
-            current === t
-              ? 'border-amber-400 bg-amber-500/15'
-              : 'border-zinc-700 bg-zinc-900 hover:border-zinc-500'
-          }`}
-        >
-          {PIECE_GLYPH[t]}
-        </button>
-      ))}
+      {tools.map((t) => {
+        const render = defaultPieces[t]
+        return (
+          <button
+            key={t}
+            onClick={() => onPick(t)}
+            title={t}
+            className={`flex h-11 w-11 items-center justify-center rounded-lg border bg-[#f0d9b5] p-1 transition ${
+              current === t
+                ? 'border-amber-400 ring-2 ring-amber-400'
+                : 'border-zinc-600 hover:border-zinc-400'
+            }`}
+          >
+            <span className="block h-8 w-8">{render?.()}</span>
+          </button>
+        )
+      })}
     </div>
   )
 }
