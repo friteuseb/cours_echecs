@@ -298,7 +298,7 @@ export default function FreeBoard() {
 
       <div className="flex flex-col gap-6 lg:flex-row">
         {/* Échiquier */}
-        <div className="w-full max-w-xl">
+        <div className="w-full max-w-xl self-start">
           <Chessboard
             options={{
               position: currentFen,
@@ -306,7 +306,7 @@ export default function FreeBoard() {
               allowDragging: true,
               allowDragOffBoard: mode === 'edit',
               squareStyles,
-              showAnimations: true,
+              showAnimations: mode === 'play',
               animationDurationInMs: 200,
               onPieceDrop: ({ sourceSquare, targetSquare }) => {
                 if (mode === 'edit') return editDrop(sourceSquare, targetSquare)
